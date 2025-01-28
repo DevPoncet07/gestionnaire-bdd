@@ -1,4 +1,5 @@
 from tkinter import Tk
+import platform
 
 from src.gestionbdd import GestionBdd
 
@@ -7,9 +8,14 @@ class Root(Tk):
 		self.mode_os=mode_os
 		Tk.__init__(self)
 		
-		if mode_os=="tablette":
+
+		if mode_os=='Windows':
+			from interface.interfacedesktop import InterfaceDesktop
+			self.interface = InterfaceDesktop(self)
+			self.interface.grid()
+		else:
 			from interface.interfacetablette import InterfaceTablette
-			self.interface=InterfaceTablette(self)
+			self.interface = InterfaceTablette(self)
 			self.interface.grid()
 			
 		self.gestionbdd=GestionBdd(self)
@@ -17,5 +23,7 @@ class Root(Tk):
 		
 		
 if __name__=="__main__":
-	root=Root("tablette")
+	plat_form=platform.system()
+	print(plat_form)
+	root=Root(plat_form)
 	root.mainloop()
