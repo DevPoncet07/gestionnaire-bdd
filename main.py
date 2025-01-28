@@ -7,6 +7,7 @@ class Root(Tk):
 	def __init__(self,mode_os):
 		self.mode_os=mode_os
 		Tk.__init__(self)
+		self['bg']="grey30"
 		
 
 		if mode_os=='Windows':
@@ -24,6 +25,5 @@ class Root(Tk):
 		
 if __name__=="__main__":
 	plat_form=platform.system()
-	print(plat_form)
 	root=Root(plat_form)
 	root.mainloop()
