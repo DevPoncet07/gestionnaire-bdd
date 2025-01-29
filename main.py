@@ -14,11 +14,11 @@ class Root(Tk):
 
 		if mode_os=='Windows':
 			from interface.interfacedesktop import InterfaceDesktop
-			self.interface = InterfaceDesktop(self)
+			self.interface = InterfaceDesktop(self,self.path)
 			self.interface.grid(padx=10,pady=10)
 		else:
 			from interface.interfacetablette import InterfaceTablette
-			self.interface = InterfaceTablette(self)
+			self.interface = InterfaceTablette(self,self.path)
 			self.interface.grid()
 			
 		self.gestionbdd=GestionBdd(self,self.path)
@@ -32,9 +32,11 @@ class Root(Tk):
 
 		self.gestionbdd.open_database('data1')
 		self.name_bdd=self.gestionbdd.names_table[0][0]
+		print(self.gestionbdd.names_table)
 		self.gestionbdd.open_table(self.name_bdd)
 		self.names_colonne=self.gestionbdd.names_column_focus
-		data=self.gestionbdd.select_command(["*","table1"])
+		data=self.gestionbdd.select_command(["*",self.gestionbdd.names_table[0][0]])
+		print(len(data))
 
 		#self.gestionbdd.close_database_focus()
 
@@ -65,6 +67,17 @@ class Root(Tk):
 			, {"name": "ccccc", "age": 50, "sexe": "f"}
 		]
 		return arg
+
+	def charger_base_de_donnee(self,name):
+		print(name)
+		self.gestionbdd.open_database(name[0])
+		self.name_bdd = self.gestionbdd.names_table[0][0]
+		print(self.gestionbdd.names_table)
+		self.gestionbdd.open_table(self.name_bdd)
+		self.names_colonne = self.gestionbdd.names_column_focus
+		data = self.gestionbdd.select_command(["*", self.gestionbdd.names_table[0][0]])
+		self.interface.mise_a_jour_data(self.names_colonne, data)
+
 
 if __name__=="__main__":
 	plat_form=platform.system()

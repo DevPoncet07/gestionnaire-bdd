@@ -2,8 +2,9 @@ from tkinter import Frame,Canvas,Text,Label,StringVar,Entry,ALL
 
 
 class InterfaceTablette(Frame):
-	def __init__(self,boss):
+	def __init__(self,boss,path):
 		self.boss=boss
+		self.path=path
 		Frame.__init__(self, master=boss, bg="grey30", width=500, height=500)
 
 		self.can = Canvas(self, width=500, height=500, bg='grey20')
