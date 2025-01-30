@@ -1,46 +1,68 @@
-from tkinter import Frame,Canvas,Text,Label,StringVar,Entry,ALL
+from tkinter import Frame, Label, StringVar
+from tkinter import ttk
+import os
+
+from .frameonglet import FrameOnglet
+from .menutop import MenuTop
 
 
 class InterfaceTablette(Frame):
-	def __init__(self,boss,path):
-		self.boss=boss
-		self.path=path
-		Frame.__init__(self, master=boss, bg="grey30", width=500, height=500)
+    def __init__(self, boss):
+        self.boss = boss
+        Frame.__init__(self, master=boss,width=500,height=500)
+        self.menu=MenuTop(self)
 
-		self.can = Canvas(self, width=500, height=500, bg='grey20')
-		self.can.grid(row=0, column=0, padx=10, pady=10)
+        self.framebouttonleft = FrameBouttonLeft(self)
+        self.framebouttonleft.grid(row=1, column=0)
 
-		self.frame_entry = Frame(self, bg='grey30')
-		self.frame_entry.grid(row=0, column=1)
-		self.text = Text(self.frame_entry, width=60, height=20, bg='grey20', state='disabled', fg='white')
-		self.text.grid(row=0, column=0, columnspan=2)
-		Label(self.frame_entry, text="Commande python : ", bg='grey30', fg='white').grid(row=1, column=0)
-		self.str_entry = StringVar()
-		self.entry_text = Entry(self.frame_entry, width=50, bg='grey20', fg='white', textvariable=self.str_entry, )
-		self.entry_text.bind("<Return>", self.sortie_entry)
-		self.entry_text.grid(row=1, column=1)
+        self.str_name_base_de_donnee = StringVar()
+        self.str_name_base_de_donnee.set("Nom de la base de donnee : ")
+        self.label_name_base_de_donnee = Label(self, textvariable=self.str_name_base_de_donnee)
+        self.label_name_base_de_donnee.grid(row=0, column=0, columnspan=2)
 
-	def sortie_entry(self, event):
-		text = self.str_entry.get()
-		self.boss.execute_commande(text)
-		self.print(text, "commande")
-		self.str_entry.set("")
+        self.notebook = ttk.Notebook(self)
+        self.notebook.grid(row=1, column=1)
+        self.onglets = []
 
-	def print(self, text, mode="console"):
-		text = mode + " : " + text + "\n"
-		self.text['state'] = 'normal'
-		self.text.insert('end', text)
-		self.text['state'] = 'disabled'
+    def demande_nouvelle_base(self):
+        self.boss.demande_nouvelle_base_de_donnee()
 
-	def mise_a_jour_data(self, names_colonne, data):
-		self.can.delete(ALL)
-		for index in range(len(names_colonne)):
-			self.can.create_rectangle(5 + index * 100, 5, 100 + index * 100, 30, outline="white")
-			self.can.create_text(30 + index * 100, 10, anchor="nw", text=names_colonne[index], fill='white')
-			for element in range(len(data)):
-				self.can.create_window(10 + index * 100, 50 + element * 25, anchor="nw",window=EntryCell(data[element][index]))
+    def demande_nouvelle_table(self):
+        self.boss.demande_nouvelle_table()
 
-class EntryCell(Text):
-	def __init__(self,text):
-		Text.__init__(self, width=10, height=1)
-		self.insert('end', text)
+    def charger_base_de_donnee(self):
+        self.boss.demande_charger_base_de_donnee()
+
+    def sauvegarder_base_de_donnee(self):
+        self.boss.sauvegarder_base_de_donnee()
+
+    def demande_modifier_table(self):
+        index = self.notebook.select()
+        index = self.notebook.index(index)
+        self.boss.demande_modifier_table(index)
+
+    def demande_delete_table(self):
+        index = self.notebook.select()
+        index = self.notebook.index(index)
+        self.boss.demande_delete_table(index)
+
+    def mise_a_jour_database(self, base_de_donnee):
+        self.str_name_base_de_donnee.set("Nom de la base de donnee : " + str(base_de_donnee.name))
+        for element in self.onglets:
+            element.destroy()
+        for index in range(len(base_de_donnee.names_table)):
+            self.add_onglet(name=base_de_donnee.names_table[index], types_column=base_de_donnee.types_column[index])
+
+    def add_onglet(self, **kwargs):
+        onglet = FrameOnglet(self, **kwargs)
+        self.onglets.append(onglet)
+        self.notebook.add(onglet, text=onglet.name)
+
+
+
+class FrameBouttonLeft(Frame):
+    def __init__(self, boss):
+        self.boss = boss
+        Frame.__init__(self)
+
+
