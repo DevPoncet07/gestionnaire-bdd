@@ -23,7 +23,9 @@ class InterfaceDesktop(Frame):
 
         self.notebook=ttk.Notebook(self)
         self.notebook.grid(row=1,column=1)
+        self.notebook.bind("<<NotebookTabChanged>>", self.on_table_change)
         self.onglets = []
+        self.index_onglet_actif=0
 
     def demande_nouvelle_base(self):
         self.boss.demande_nouvelle_base_de_donnee()
@@ -50,7 +52,8 @@ class InterfaceDesktop(Frame):
     def mise_a_jour_database(self,base_de_donnee):
         self.str_name_base_de_donnee.set("Nom de la base de donnee : "+str(base_de_donnee.name))
         for element in self.onglets:
-            element.destroy()
+            self.notebook.forget(element)
+        self.onglets=[]
         for index in range(len(base_de_donnee.names_table)):
             self.add_onglet(name=base_de_donnee.names_table[index],types_column=base_de_donnee.types_column[index])
 
@@ -58,6 +61,15 @@ class InterfaceDesktop(Frame):
         onglet=FrameOnglet(self,**kwargs)
         self.onglets.append(onglet)
         self.notebook.add(onglet, text=onglet.name)
+
+    def on_table_change(self,event):
+        index = self.notebook.select()
+        self.index_onglet_actif = self.notebook.index(index)
+        self.boss.demande_load_data_onglet(self.index_onglet_actif)
+
+    def mise_a_jour_datas(self,datas):
+        self.onglets[self.index_onglet_actif].mise_a_jour_datas(datas)
+
 
 
 

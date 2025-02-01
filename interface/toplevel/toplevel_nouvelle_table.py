@@ -63,12 +63,12 @@ class ToplevelNouvelleTable(Toplevel):
         self.str_type_column.set("INTEGER")
 
     def modifier_column(self):
-        if self.column_focus!=(-1):
+        if self.column_focus>0:
             self.type_column[self.column_focus][1:2]=[self.str_name_column.get(),self.str_type_column.get()]
         self.remplir_listbox(self.type_column)
 
     def delete_column(self):
-        if self.column_focus!=(-1):
+        if self.column_focus>0 :
             del self.type_column[self.column_focus]
         self.remplir_listbox(self.type_column)
 

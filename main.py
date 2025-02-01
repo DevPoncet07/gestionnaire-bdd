@@ -35,7 +35,7 @@ class Root(Tk):
             #self.interface.grid()
 
         self.gestionbdd = GestionBdd(self, self.path)
-        self.base_de_donnee_active = self.gestionbdd.open_database("data1")
+        self.base_de_donnee_active = self.gestionbdd.open_database("leaders")
         self.interface.mise_a_jour_database(self.base_de_donnee_active)
 
     def demande_nouvelle_base_de_donnee(self):
@@ -92,6 +92,10 @@ class Root(Tk):
         self.base_de_donnee_active = self.gestionbdd.open_database(self.base_de_donnee_active.name)
         self.interface.mise_a_jour_database(self.base_de_donnee_active)
         self.fenetre_delete_table.destroy()
+
+    def demande_load_data_onglet(self,index_onglet):
+        self.base_de_donnee_active=self.gestionbdd.load_data_onglet_50(self.base_de_donnee_active,index_onglet)
+        self.interface.mise_a_jour_datas(self.base_de_donnee_active.datas)
 
 
 

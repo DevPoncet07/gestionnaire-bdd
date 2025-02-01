@@ -1,4 +1,4 @@
-from tkinter import Toplevel,Button,Label,StringVar,Listbox,Frame
+from tkinter import Toplevel,Button,Label,StringVar,Listbox,LabelFrame
 import os
 
 
@@ -9,20 +9,24 @@ class ToplevelChargerBase(Toplevel):
         self.file_names=[]
         self.index=0
         Toplevel.__init__(self)
-
-        self.listbox_projet=Listbox(self,width=20,height=10)
-        self.listbox_projet.grid(row=0,column=0)
+        frame_bdd_dossier=LabelFrame(self,text='Dossier base_de_donnee')
+        frame_bdd_dossier.grid(row=0,column=0)
+        Label(frame_bdd_dossier,text='Base de donnee contenus dans\n le dossier local base_de_donnee').grid(row=0,column=0)
+        self.listbox_projet=Listbox(frame_bdd_dossier,width=20,height=10)
+        self.listbox_projet.grid(row=0,column=1)
         self.listbox_projet.bind("<ButtonRelease-1>",self.sortie_listbox_projet)
 
         self.remplir_listbox()
 
-        frame_down=Frame(self)
-        frame_down.grid(row=1,column=0)
+        frame_down=LabelFrame(self,text="Base de donnee selectionner",width=350,height=120)
+        frame_down.grid(row=1, column=0, padx=10, pady=10)
+
+
         self.str_name_bdd = StringVar()
         self.str_name_bdd.set("nom de la base de donnee charger : ")
-        Label(frame_down,textvariable=self.str_name_bdd).grid(row=0,column=0)
+        Label(frame_down,textvariable=self.str_name_bdd).place(x=50,y=20)
 
-        Button(frame_down,text='Valider',command=self.sortie_toplevel_charger_base_de_donnee).grid(row=1,column=0)
+        Button(frame_down,text='Valider',command=self.sortie_toplevel_charger_base_de_donnee).place(x=120,y=50)
 
     def remplir_listbox(self):
         self.file_names=[]

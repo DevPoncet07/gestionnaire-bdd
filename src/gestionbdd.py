@@ -42,13 +42,11 @@ class GestionBdd:
 	def create_data_base_and_table(self,base_de_donnee):
 		self.connexion_focus = sqlite3.connect(self.path + "/base_de_donnee/" + str(base_de_donnee.name) + ".db")
 		cursor = self.connexion_focus.cursor()
-		print(base_de_donnee.types_column)
 		for index in range(len(base_de_donnee.names_table)):
 			text="CREATE TABLE "+base_de_donnee.names_table[index]+" ( "
 			for colone in base_de_donnee.types_column[index]:
 				text+=str(colone[1])+" "+str(colone[2])+", "
 			text=text[:-2]+str(" )")
-			print("execute : ",text)
 			cursor.execute(text)
 		cursor.close()
 		self.close_connexion_focus()
@@ -57,6 +55,20 @@ class GestionBdd:
 		if self.connexion_focus is not None:
 			self.connexion_focus.close()
 			self.connexion_focus = None
+
+	def load_data_onglet_50(self,base_de_donnee,index_table):
+		name_table=base_de_donnee.names_table[index_table]
+		self.connexion_focus = sqlite3.connect(self.path + "/base_de_donnee/" + str(base_de_donnee.name) + ".db")
+		cursor = self.connexion_focus.cursor()
+		cursor.execute("SELECT * FROM  {} ;".format(name_table))
+		liste_data=[]
+		for data in cursor.fetchall():
+			liste_data.append(data)
+		base_de_donnee.datas=liste_data
+		cursor.close()
+		self.close_connexion_focus()
+
+		return base_de_donnee
 
 
 
