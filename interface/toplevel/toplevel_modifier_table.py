@@ -2,10 +2,10 @@ from tkinter import Toplevel,Button,Entry,Label,StringVar,LabelFrame,Listbox,Opt
 
 
 class ToplevelModifierTable(Toplevel):
-    def __init__(self,boss,name,types_column):
+    def __init__(self, boss, table_name, column_names):
         self.boss=boss
         self.type_column=[]
-        for element in types_column:
+        for element in column_names:
             self.type_column.append(element)
         self.value_type=["NULL","INTEGER","REAL","TEXT","BLOB","INTEGER PRIMARY KEY"]
         self.column_focus=-1
@@ -14,7 +14,7 @@ class ToplevelModifierTable(Toplevel):
         frame_name=LabelFrame(self,text="Table")
         frame_name.grid(row=0,column=0)
         Label(frame_name,text="nom de la nouvelle table : ").grid(row=0,column=0,pady=10)
-        self.str_name_table=StringVar(value=name)
+        self.str_name_table=StringVar(value=table_name)
         self.entry_name=Entry(frame_name,width=30,textvariable=self.str_name_table)
         self.entry_name.grid(row=0,column=1)
 
@@ -76,4 +76,4 @@ class ToplevelModifierTable(Toplevel):
 
     def sortie_toplevel_modifier_table(self):
         name=self.str_name_table.get()
-        self.boss.sortie_toplevel_modifier_table(name=name,types_column=self.type_column)
+        self.boss.answer_window_modify_table(name,self.type_column)

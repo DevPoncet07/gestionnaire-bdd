@@ -1,15 +1,17 @@
 from tkinter import Toplevel, Button, Entry, Label, StringVar, Frame, LabelFrame, Listbox,Text,Scrollbar
 
-from .toplevel_nouvelle_table import ToplevelNouvelleTable
+from .toplevel_new_table import ToplevelNewTable
+from .toplevel_modifier_table import ToplevelModifierTable
 
 
-class ToplevelNouvelleBase(Toplevel):
+class ToplevelNewDatabase(Toplevel):
     def __init__(self,boss):
         self.boss=boss
         self.index_table_focus=None
-        self.names_table=[]
-        self.types_column=[]
-        self.fenetre_nouvelle_table=None
+        self.tables_names=[]
+        self.column_names=[]
+        self.window_new_table=None
+        self.window_modify_table=None
 
         Toplevel.__init__(self)
 
@@ -21,8 +23,8 @@ class ToplevelNouvelleBase(Toplevel):
         self.entry_name.grid(row=0,column=1)
         frame_tables=LabelFrame(self,text='tables')
         frame_tables.grid(row=1,column=0,padx=10,pady=10)
-        Button(frame_tables,text="Nouvelle tables",command=self.demande_add_table).grid(row=0,column=0,padx=10,pady=10)
-        Button(frame_tables, text="Modifie tables", command=self.demande_modifier_table).grid(row=1, column=0, padx=10,
+        Button(frame_tables,text="Nouvelle tables",command=self.ask_window_new_table).grid(row=0,column=0,padx=10,pady=10)
+        Button(frame_tables, text="Modifie tables", command=self.aks_window_modify_table).grid(row=1, column=0, padx=10,
                                                                                           pady=10)
         Button(frame_tables,text="Supprimer table",command=self.delete_table).grid(row=2,column=0,pady=10)
         self.listbox_table=Listbox(frame_tables,width=20,height=5)
@@ -36,7 +38,7 @@ class ToplevelNouvelleBase(Toplevel):
         self.scrollbar_y=Scrollbar(frame_column,orient='vertical',command=self.text_column.yview)
         self.scrollbar_y.grid(row=0,column=1,sticky='ns')
 
-        Button(self,text='Valider',command=self.sortie_toplevel_nouvelle_base_de_donnee).grid(row=5,column=0)
+        Button(self, text='Valider', command=self.answer).grid(row=5, column=0)
 
     def remplir_listbox(self,names):
         self.listbox_table.delete(0,'end')
@@ -48,26 +50,35 @@ class ToplevelNouvelleBase(Toplevel):
         self.index_table_focus=index[0]
         self.text_column['state']='normal'
         self.text_column.delete(0.0,'end')
-        for column in self.types_column[self.index_table_focus]:
+        for column in self.column_names[self.index_table_focus]:
             self.text_column.insert('end',str(column)+"\n")
         self.text_column['state'] = 'disabled'
 
-    def demande_add_table(self):
-        self.fenetre_nouvelle_table=ToplevelNouvelleTable(self)
+    def ask_window_new_table(self):
+        self.window_new_table=ToplevelNewTable(self)
 
-    def sortie_toplevel_nouvelle_table(self,name,types_column):
-        self.names_table.append(name)
-        self.types_column.append(types_column)
-        self.remplir_listbox(self.names_table)
-        self.fenetre_nouvelle_table.destroy()
+    def answer_window_new_table(self,name,types_column):
+        self.tables_names.append(name)
+        self.column_names.append(types_column)
+        self.remplir_listbox(self.tables_names)
+        self.window_new_table.destroy()
 
-    def demande_modifier_table(self):
-        pass
+    def aks_window_modify_table(self):
+        self.window_modify_table=ToplevelModifierTable(self,self.tables_names[self.index_table_focus],self.column_names[self.index_table_focus])
+
+    def answer_window_modify_table(self,table_name,column_names):
+        self.delete_table()
+        self.tables_names.insert(self.index_table_focus,table_name)
+        self.column_names.insert(self.index_table_focus,column_names)
+        self.remplir_listbox(self.tables_names)
+        self.window_modify_table.destroy()
 
     def delete_table(self):
-        pass
+        del self.tables_names[self.index_table_focus]
+        del self.column_names[self.index_table_focus]
+        self.remplir_listbox(self.tables_names)
 
 
-    def sortie_toplevel_nouvelle_base_de_donnee(self):
+    def answer(self):
         name=self.str_name_table.get()
-        self.boss.sortie_toplevel_nouvelle_base_de_donnee(name=name,names_table=self.names_table,types_column=self.types_column)
+        self.boss.answer_window_new_database(filename=name, tables_names=self.tables_names, column_infos=self.column_names)

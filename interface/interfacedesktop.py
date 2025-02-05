@@ -1,6 +1,5 @@
 from tkinter import Frame, Label, StringVar
 from tkinter import ttk
-import os
 
 from .frameonglet import FrameOnglet
 from .menutop import MenuTop
@@ -27,35 +26,35 @@ class InterfaceDesktop(Frame):
         self.onglets = []
         self.index_onglet_actif=0
 
-    def demande_nouvelle_base(self):
-        self.boss.demande_nouvelle_base_de_donnee()
+    def ask_window_new_database(self):
+        self.boss.ask_window_new_database()
 
-    def demande_nouvelle_table(self):
-        self.boss.demande_nouvelle_table()
+    def ask_window_new_table(self):
+        self.boss.ask_window_new_table()
 
     def charger_base_de_donnee(self):
-        self.boss.demande_charger_base_de_donnee()
+        self.boss.ask_load_database()
 
-    def sauvegarder_base_de_donnee(self):
-        self.boss.sauvegarder_base_de_donnee()
+    def save_object_database_into_file(self):
+        self.boss.save_object_database_into_file()
 
-    def demande_modifier_table(self):
+    def ask_modify_table(self):
         index=self.notebook.select()
         index=self.notebook.index(index)
-        self.boss.demande_modifier_table(index)
+        self.boss.ask_modify_table(index)
 
-    def demande_delete_table(self):
+    def ask_delete_table(self):
         index = self.notebook.select()
         index = self.notebook.index(index)
-        self.boss.demande_delete_table(index)
+        self.boss.ask_delete_table(index)
 
     def mise_a_jour_database(self,base_de_donnee):
-        self.str_name_base_de_donnee.set("Nom de la base de donnee : "+str(base_de_donnee.name))
+        self.str_name_base_de_donnee.set("Nom de la base de donnee : "+str(base_de_donnee.filename))
         for element in self.onglets:
             self.notebook.forget(element)
         self.onglets=[]
-        for index in range(len(base_de_donnee.names_table)):
-            self.add_onglet(name=base_de_donnee.names_table[index],types_column=base_de_donnee.types_column[index])
+        for index in range(len(base_de_donnee.tables_names)):
+            self.add_onglet(name=base_de_donnee.tables_names[index], types_column=base_de_donnee.column_names[index])
 
     def add_onglet(self,**kwargs):
         onglet=FrameOnglet(self,**kwargs)

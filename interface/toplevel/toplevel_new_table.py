@@ -1,10 +1,10 @@
 from tkinter import Toplevel,Button,Entry,Label,StringVar,LabelFrame,Listbox,OptionMenu
 
 
-class ToplevelNouvelleTable(Toplevel):
+class ToplevelNewTable(Toplevel):
     def __init__(self,boss):
         self.boss=boss
-        self.type_column=[[0,"id","INTEGER PRIMARY KEY",0,"",0]]
+        self.column_names=[[0, "id", "INTEGER PRIMARY KEY", 0, "", 0]]
         self.value_type=["NULL","INTEGER","REAL","TEXT","BLOB","INTEGER PRIMARY KEY"]
         self.column_focus=-1
         Toplevel.__init__(self)
@@ -39,15 +39,19 @@ class ToplevelNouvelleTable(Toplevel):
         self.boutton_modifier=Button(frame_infos_column, text='Modifier colonne', command=self.modifier_column)
         self.boutton_modifier.grid(row=2,column=1,pady=10)
 
-        Button(self,text='Valider la table',command=self.sortie_toplevel_nouvelle_table).grid(row=5,column=0,pady=10)
-        self.remplir_listbox(self.type_column)
+        Button(self,text='Valider la table',command=self.answer).grid(row=5,column=0,pady=10)
+        self.remplir_listbox(self.column_names)
+
+    def answer(self):
+        table_name = self.str_name_table.get()
+        self.boss.answer_window_new_table(table_name,self.column_names)
 
     def sortie_listbox_column(self,event):
         index=self.listbox_column.curselection()
         index=index[0]
         self.column_focus=index
-        self.str_name_column.set(str(self.type_column[index][1]))
-        self.str_type_column.set(str(self.type_column[index][2]))
+        self.str_name_column.set(str(self.column_names[index][1]))
+        self.str_type_column.set(str(self.column_names[index][2]))
 
 
     def remplir_listbox(self,names_column):
@@ -56,24 +60,21 @@ class ToplevelNouvelleTable(Toplevel):
             self.listbox_column.insert('end',str(element[1])+" "+str(element[2]))
 
     def add_column(self):
-        self.type_column.append([len(self.type_column),"empty","INTEGER",0,"",0])
-        self.remplir_listbox(self.type_column)
-        self.column_focus = len(self.type_column)-1
-        self.str_name_column.set(str(self.type_column[self.column_focus][1]))
+        self.column_names.append([len(self.column_names), "empty", "INTEGER", 0, "", 0])
+        self.remplir_listbox(self.column_names)
+        self.column_focus = len(self.column_names) - 1
+        self.str_name_column.set(str(self.column_names[self.column_focus][1]))
         self.str_type_column.set("INTEGER")
 
     def modifier_column(self):
         if self.column_focus>0:
-            self.type_column[self.column_focus][1:2]=[self.str_name_column.get(),self.str_type_column.get()]
-        self.remplir_listbox(self.type_column)
+            self.column_names[self.column_focus][1:2]=[self.str_name_column.get(), self.str_type_column.get()]
+        self.remplir_listbox(self.column_names)
 
     def delete_column(self):
         if self.column_focus>0 :
-            del self.type_column[self.column_focus]
-        self.remplir_listbox(self.type_column)
+            del self.column_names[self.column_focus]
+        self.remplir_listbox(self.column_names)
 
-    def sortie_toplevel_nouvelle_table(self):
-        name=self.str_name_table.get()
-        self.boss.sortie_toplevel_nouvelle_table(name=name,types_column=self.type_column)
 
 

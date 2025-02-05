@@ -3,8 +3,8 @@ import os
 import platform
 
 from src.gestionbdd import GestionBdd
-from interface.toplevel.toplevel_nouvelle_table import ToplevelNouvelleTable
-from interface.toplevel.toplevel_nouvelle_base import ToplevelNouvelleBase
+from interface.toplevel.toplevel_new_table import ToplevelNewTable
+from interface.toplevel.toplevel_new_database import ToplevelNewDatabase
 from interface.toplevel.toplevel_charger_base import ToplevelChargerBase
 from interface.toplevel.toplevel_modifier_table import ToplevelModifierTable
 from interface.toplevel.toplevel_delete_table import ToplevelDeleteTable
@@ -15,13 +15,14 @@ class Root(Tk):
 
         self.mode_os = mode_os
         Tk.__init__(self)
+        self.protocol('WN_DELETE_WINDOW',self.quit_programme_with_x)
         self.path = os.path.dirname(os.path.realpath(__file__))
-        self.fenetre_nouvelle_base=None
-        self.fenetre_nouvelle_table=None
-        self.base_de_donnee_active=None
-        self.fenetre_charger_bdd = None
+        self.windows_new_database=None
+        self.window_new_table=None
+        self.database_focus=None
+        self.window_load_database = None
         self.index_temp_modifier_table=None
-        self.fenetre_modifier_table =None
+        self.window_modify_table =None
         self.fenetre_delete_table=None
 
 
@@ -35,67 +36,85 @@ class Root(Tk):
             #self.interface.grid()
 
         self.gestionbdd = GestionBdd(self, self.path)
-        self.base_de_donnee_active = self.gestionbdd.open_database("leaders")
-        self.interface.mise_a_jour_database(self.base_de_donnee_active)
+        #self.create_database1()
+        self.database_focus=self.gestionbdd.open_database_from_file('data1')
+        self.interface.mise_a_jour_database(self.database_focus)
 
-    def demande_nouvelle_base_de_donnee(self):
-        self.fenetre_nouvelle_base = ToplevelNouvelleBase(self)
+    def ask_window_new_database(self):
+        self.windows_new_database = ToplevelNewDatabase(self)
 
-    def sortie_toplevel_nouvelle_base_de_donnee(self,**kwargs):
-        self.base_de_donnee_active=self.gestionbdd.cree_objet_base_de_donne(**kwargs)
-        self.sauvegarder_base_de_donnee()
-        self.fenetre_nouvelle_base.destroy()
-        self.base_de_donnee_active = self.gestionbdd.open_database(kwargs['name'])
-        self.interface.mise_a_jour_database(self.base_de_donnee_active)
+    def answer_window_new_database(self, **kwargs):
+        self.database_focus=self.gestionbdd.create_object_empty_database(kwargs['filename'])
+        self.gestionbdd.add_multi_table_and_column_empty(self.database_focus,**kwargs)
+        self.windows_new_database.destroy()
+        self.interface.mise_a_jour_database(self.database_focus)
 
-    def demande_nouvelle_table(self):
-        self.fenetre_nouvelle_table=ToplevelNouvelleTable(self)
+    def ask_window_new_table(self):
+        self.window_new_table=ToplevelNewTable(self)
 
-    def sortie_toplevel_nouvelle_table(self,**kwargs):
-        self.base_de_donnee_active.add_table(kwargs['name'],kwargs["types_column"])
-        self.sauvegarder_base_de_donnee()
-        self.base_de_donnee_active=self.gestionbdd.open_database(self.base_de_donnee_active.name)
-        self.interface.mise_a_jour_database(self.base_de_donnee_active)
-        self.fenetre_nouvelle_table.destroy()
+    def answer_window_new_table(self, table_names,column_names):
+        self.database_focus.add_table_and_column_empty(table_names,column_names)
+        self.window_new_table.destroy()
+        self.interface.mise_a_jour_database(self.database_focus)
 
-    def sauvegarder_base_de_donnee(self):
-        self.gestionbdd.sauvegarder_base_de_donnee(self.base_de_donnee_active)
+    def save_object_database_into_file(self):
+        self.gestionbdd.save_object_database_into_file(self.database_focus)
 
-    def demande_charger_base_de_donnee(self):
-        self.fenetre_charger_bdd=ToplevelChargerBase(self,self.path)
+    def ask_load_database(self):
+        self.window_load_database=ToplevelChargerBase(self, self.path)
 
-    def sortie_toplevel_charger_base_de_donnee(self,name):
-        self.base_de_donnee_active=self.gestionbdd.open_database(name)
-        self.interface.mise_a_jour_database(self.base_de_donnee_active)
-        self.fenetre_charger_bdd.destroy()
+    def answer_window_load_database(self, filename):
+        self.database_focus=self.gestionbdd.open_database_from_file(filename)
+        self.interface.mise_a_jour_database(self.database_focus)
+        self.window_load_database.destroy()
 
-    def demande_modifier_table(self,index):
+    def ask_modify_table(self,index):
         self.index_temp_modifier_table=index
-        self.fenetre_modifier_table=ToplevelModifierTable(self,self.base_de_donnee_active.names_table[index],
-                                                          self.base_de_donnee_active.types_column[index])
+        self.window_modify_table=ToplevelModifierTable(self, self.database_focus.tables_names[index],
+                                                       self.database_focus.column_names[index])
 
-    def sortie_toplevel_modifier_table(self,**kwargs):
-        self.base_de_donnee_active.delete_table(self.index_temp_modifier_table)
-        self.base_de_donnee_active.add_table(kwargs["name"],kwargs['types_column'])
-        self.sauvegarder_base_de_donnee()
-        self.base_de_donnee_active = self.gestionbdd.open_database(self.base_de_donnee_active.name)
-        self.interface.mise_a_jour_database(self.base_de_donnee_active)
-        self.fenetre_modifier_table.destroy()
+    def answer_window_modify_table(self,table_name,column_names):
+        self.database_focus.modify_table_by_index(self.index_temp_modifier_table,table_name,column_names)
+        self.interface.mise_a_jour_database(self.database_focus)
+        self.window_modify_table.destroy()
 
-    def demande_delete_table(self,index):
+    def ask_delete_table(self,index):
         self.index_temp_modifier_table = index
-        self.fenetre_delete_table=ToplevelDeleteTable(self,self.base_de_donnee_active.names_table[index])
+        self.fenetre_delete_table=ToplevelDeleteTable(self, self.database_focus.tables_names[index])
 
-    def sortie_toplevel_delete_table(self):
-        self.base_de_donnee_active.delete_table(self.index_temp_modifier_table)
-        self.sauvegarder_base_de_donnee()
-        self.base_de_donnee_active = self.gestionbdd.open_database(self.base_de_donnee_active.name)
-        self.interface.mise_a_jour_database(self.base_de_donnee_active)
+    def answer_window_delete_table(self):
+        self.database_focus.delete_table(self.index_temp_modifier_table)
+        self.interface.mise_a_jour_database(self.database_focus)
         self.fenetre_delete_table.destroy()
 
+    #########################################################################
+
     def demande_load_data_onglet(self,index_onglet):
-        self.base_de_donnee_active=self.gestionbdd.load_data_onglet_50(self.base_de_donnee_active,index_onglet)
-        self.interface.mise_a_jour_datas(self.base_de_donnee_active.datas)
+        #self.database_focus=self.gestionbdd.load_data_onglet_50(self.database_focus, index_onglet)
+        self.interface.mise_a_jour_datas(self.database_focus.datas_per_tables[0])
+
+    def quit_programme_with_x(self):
+        root.gestionbdd.close_connexion_focus()
+        self.destroy()
+
+
+    def create_database1(self):
+        self.database_focus = self.gestionbdd.create_object_empty_database('data1')
+        self.database_focus.add_table_and_column_empty("table_1",
+                                                       [[0, "id", "INTEGER", 1, 1], [1, "nom", "TEXT", "", 0]])
+        self.database_focus.add_data_one_line(0, [0, 'ad'])
+        self.database_focus.add_data_one_line(0, [1, 'ad'])
+        self.database_focus.add_data_one_line(0, [2, 'tt'])
+        self.database_focus.add_table_and_column_empty("table_2",
+                                                       [[0, "id", "INTEGER", 1, 1], [1, "nom", "TEXT", "", 0]])
+        self.database_focus.add_data_one_line(1, [0, 'ad'])
+        self.database_focus.add_data_one_line(1, [1, 'ad'])
+        self.database_focus.add_data_one_line(1, [2, 'tt'])
+        self.database_focus.add_data_one_line(1, [3, 'tt'])
+        self.database_focus.add_data_one_line(1, [4, 'tt'])
+        self.database_focus.add_data_one_line(1, [5, 'tt'])
+
+        self.gestionbdd.save_object_database_into_file(self.database_focus, 'data1')
 
 
 
@@ -103,4 +122,3 @@ if __name__=="__main__":
     plat_form=platform.system()
     root=Root(plat_form)
     root.mainloop()
-    root.gestionbdd.close_connexion_focus()
