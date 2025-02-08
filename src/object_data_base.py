@@ -32,6 +32,10 @@ class ObjectDataBase:
         self.len_column_per_tables.append(0)
         self.number_of_tables+=1
 
+    def add_multi_table_and_column_empty(self,table_name,column_names):
+        for index in range(len(table_name)):
+            self.add_table_and_column_empty(table_name[index],column_names[index])
+
     def add_table_and_column_empty(self,table_name,column_names):
         self.tables_names.append(table_name)
         self.column_names.append(column_names)
@@ -46,7 +50,16 @@ class ObjectDataBase:
         self.tables_names[index]=new_table_name
         self.column_names[index]=new_column_names
         self.len_column_per_tables.append(len(new_column_names))
-        print(self.datas_per_tables[index])
+        self.analyse_modify_table(index)
+
+    def analyse_modify_table(self,index):
+        nb_column=len(self.column_names[index])
+        for row in range(len(self.datas_per_tables[index])):
+            while len(self.datas_per_tables[index][row])<nb_column:
+                self.datas_per_tables[index][row].append("NULL")
+
+    def delete_data_one_line(self,index_table,index_row):
+        del self.datas_per_tables[index_table][index_row]
 
     def delete_table(self, index):
         del self.tables_names[index]

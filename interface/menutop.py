@@ -10,6 +10,7 @@ class MenuTop(Menu):
         menu_file.add_command(label='Nouvelle base de donnee', command=self.boss.ask_window_new_database)
         menu_file.add_command(label='Charger base de donnee',command=self.boss.charger_base_de_donnee)
         menu_file.add_command(label='Sauvegarder base de donnee', command=self.boss.save_object_database_into_file)
+        menu_file.add_command(label='Sauvegarder base de donnee as ', command=self.boss.save_object_database_into_file_as)
         self.add_cascade(label='File',menu=menu_file)
 
         menu_table=Menu(self,tearoff=0)

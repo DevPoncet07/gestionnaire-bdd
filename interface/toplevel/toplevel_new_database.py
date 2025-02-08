@@ -81,4 +81,4 @@ class ToplevelNewDatabase(Toplevel):
 
     def answer(self):
         name=self.str_name_table.get()
-        self.boss.answer_window_new_database(filename=name, tables_names=self.tables_names, column_infos=self.column_names)
+        self.boss.answer_window_new_database(filename=name, table_names=self.tables_names, column_infos=self.column_names)

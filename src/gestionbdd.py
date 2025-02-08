@@ -1,3 +1,4 @@
+import os
 import sqlite3
 
 from .object_data_base import ObjectDataBase
@@ -13,18 +14,15 @@ class GestionBdd:
 		database = ObjectDataBase(filename)
 		return database
 
-
-	def add_table_and_column_empty(self, database, table_name, column_names):
-		database.add_table_and_column_empty(table_name, column_names)
-
-	def add_multi_table_and_column_empty(self,database,**kwargs):
-		for index in range(len(kwargs['tables_names'])):
-			database.add_table_and_column_empty(kwargs['tables_names'][index],kwargs['column_infos'][index])
-
-
 	def save_object_database_into_file(self,database,filename=""):
 		if filename=="":
 			filename=database.filename
+		liste_name_file=os.listdir(self.path + "/base_de_donnee/")
+		liste_bdd=[]
+		for e in liste_name_file:
+			liste_bdd.append(e[:-3])
+		if filename in liste_bdd:
+			os.remove(self.path + "/base_de_donnee/"+filename+".db")
 		self.connexion_focus = sqlite3.connect(self.path + "/base_de_donnee/" + str(filename) + ".db")
 		cursor = self.connexion_focus.cursor()
 		for index in range(len(database.tables_names)):
@@ -71,7 +69,7 @@ class GestionBdd:
 			cursor.execute('SELECT * FROM '+element)
 			datas=[]
 			for data in cursor.fetchall():
-				datas.append(data)
+				datas.append(list(data))
 			datas_per_tables.append(datas)
 		for index_table in range(len(names_table)):
 			database.add_table_and_column_empty(names_table[index_table],types_column[index_table])

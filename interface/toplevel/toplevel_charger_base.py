@@ -43,4 +43,4 @@ class ToplevelChargerBase(Toplevel):
 
     def sortie_toplevel_charger_base_de_donnee(self):
         name=self.file_names[self.index]
-        self.boss.answer_window_load_database(name=name)
+        self.boss.answer_window_load_database(name)
