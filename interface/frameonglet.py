@@ -3,14 +3,15 @@ from tkinter import Frame, Canvas, Label, ALL, Scrollbar,Text,Button,StringVar
 
 class FrameOnglet(Frame):
     def __init__(self,boss,**kwargs):
+        self.number_row = None
         self.boss=boss
         self.name=kwargs["name"]
         self.types_column=kwargs["types_column"]
         self.taille_x_case=150
-        self.step_view=5
+        self.step_view=50
         self.view_max=0
         self.view_min=0
-        self.index_row_focus=None
+        self.index_row_focus=0
         self.img_row_focus=None
         self.text_img_row_focus=None
         self.liste_text_row=[]
@@ -88,10 +89,12 @@ class FrameOnglet(Frame):
         if datas:
             for y in range(self.view_min,self.view_max):
                 for x in range(taille_x):
-                    self.can.create_rectangle( self.taille_x_case * x, 25*y,   150 * x + self.taille_x_case, 25*y+25)
-                    self.can.create_text(10+self.taille_x_case*x,5+25*y,anchor='nw',text=str(datas[y][x]))
-                self.can_index.create_rectangle(0,25*y,35,25*y+25)
-                self.can_index.create_text(4,6+25*y,anchor='nw',text=str(y))
+                    y_temp=y-self.view_min
+                    self.can.create_rectangle( self.taille_x_case * x, 25*y_temp,   150 * x + self.taille_x_case, 25*y_temp+25)
+                    self.can.create_text(10+self.taille_x_case*x,5+25*y_temp,anchor='nw',text=str(datas[y][x]))
+                self.can_index.create_rectangle(0,25*y_temp,35,25*y_temp+25)
+                self.can_index.create_text(4,6+25*y_temp,anchor='nw',text=str(y))
+        taille_y=self.view_max-self.view_min
         self.can.config(scrollregion=(0,0,1+self.taille_x_case*taille_x,1+25*taille_y))
         self.can_head.config(scrollregion=(0,0,1+self.taille_x_case*taille_x,40))
         self.can_index.config(scrollregion=(0,0,35,1+25*taille_y))
@@ -119,8 +122,7 @@ class FrameOnglet(Frame):
         self.can_index.yview(args[0], args[1])
 
     def exit_can_index(self,event):
-
-        y=(int(self.can_index.canvasy(0))+event.y)//25
+        y=((int(self.can_index.canvasy(0))+event.y)//25)+self.view_min
         self.boss.change_row_focus(y)
 
     def mise_a_jour_row_focus(self,index,row_data):
@@ -128,8 +130,9 @@ class FrameOnglet(Frame):
             self.can_index.delete(self.img_row_focus)
             self.can_index.delete(self.text_img_row_focus)
         self.index_row_focus=index
+        index-=self.view_min
         self.img_row_focus=self.can_index.create_rectangle(0, 25 * index, 35, 25 * index + 25,fill='grey80')
-        self.text_img_row_focus=self.can_index.create_text(4, 6 + 25 * index, anchor='nw', text=str(index))
+        self.text_img_row_focus=self.can_index.create_text(4, 6 + 25 * index, anchor='nw', text=str(self.index_row_focus))
         self.canvas_modif_row.delete(ALL)
         self.liste_text_row=[]
         for element in range(len(row_data)):

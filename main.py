@@ -115,7 +115,7 @@ class Root(Tk):
         self.interface.mise_a_jour_table(self.database_focus,self.index_onglet_focus)
 
     def change_row_focus(self,index):
-        if index<len(self.database_focus.datas_per_tables[self.index_onglet_focus]):
+        if index<self.interface.onglets[self.index_onglet_focus].view_max:
             self.index_row_focus=index
             self.interface.mise_a_jour_row_focus(index,self.database_focus.datas_per_tables[self.index_onglet_focus][index])
 
